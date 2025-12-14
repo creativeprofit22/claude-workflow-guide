@@ -10,6 +10,31 @@ Efficient context management for multi-project work with Claude Code.
 
 ---
 
+## The `/checkpoint` Command
+
+One command that handles everything — saves to file AND gives you a continuation prompt.
+
+### Setup
+
+Create `~/.claude/commands/checkpoint.md` with [this content](checkpoint.md).
+
+### What It Does
+
+When you run `/checkpoint`:
+
+1. **Updates CLAUDE.md** — Progress saved to disk (survives closing terminal)
+2. **Outputs a continuation prompt** — Ready to copy if you need to clear context
+
+### When To Use It
+
+| Situation | What Happens |
+|-----------|--------------|
+| Context getting full, keep working | Copy prompt → `/clear` → paste → continue |
+| Done for the day | Just close. CLAUDE.md is saved for tomorrow |
+| Quick save mid-session | State captured either way |
+
+---
+
 ## Starting a New Chat
 
 ```
@@ -20,15 +45,27 @@ That's it. Claude navigates there, reads `CLAUDE.md`, knows everything.
 
 ---
 
+## Mid-Session: Context Getting Full
+
+Run `/context` to check usage. When it's getting high:
+
+```
+/checkpoint
+```
+
+Then either:
+- **Keep working**: Copy the prompt → `/clear` → paste → continue with fresh context
+- **Take a break**: Just leave it. CLAUDE.md is already updated.
+
+---
+
 ## Ending a Session
 
 ```
-Update CLAUDE.md with today's progress and give me the project path
+/checkpoint
 ```
 
-You get:
-- Updated docs for next session
-- Path to paste in next chat
+Close the terminal. Tomorrow, start with "Let's work on /path/to/project" and you're back.
 
 ---
 
@@ -113,23 +150,24 @@ Paste the right path when starting a chat.
 
 ## Quick Reference
 
-| Action | What to Say |
-|--------|-------------|
+| Action | What to Do |
+|--------|------------|
 | Start session | `Let's work on [path]` |
+| Check context | `/context` |
+| Save progress + get continuation prompt | `/checkpoint` |
+| Clear and continue | Copy prompt → `/clear` → paste |
 | Focus on section | `Focus on [files/folders]` |
-| End session | `Update CLAUDE.md with progress and give me the path` |
-| Check project | `What project is this?` |
-| Avoid breaks | `[X] connects to [Y] - don't break that` |
 
 ---
 
 ## Why This Works
 
-- **No repeated explanations** - docs hold context
-- **Minimal token usage** - read only what's needed
-- **Clean handoffs** - next chat picks up instantly
-- **Nothing breaks** - interfaces documented
+- **No repeated explanations** — docs hold context
+- **Minimal token usage** — read only what's needed
+- **Clean handoffs** — next chat picks up instantly
+- **Nothing breaks** — interfaces documented
+- **Mid-session covered** — `/checkpoint` handles context bloat
 
 ---
 
-*Keep it simple. Let the docs do the talking.*
+*One command. Both problems solved.*
