@@ -1,5 +1,4 @@
 ---
-name: checkpoint
 description: Save progress to CLAUDE.md AND generate continuation prompt
 ---
 
@@ -49,20 +48,34 @@ After updating the file, output a ready-to-use continuation prompt for immediate
 ```
 ## Continuation Prompt
 
-I'm continuing work on [Project Name] in [directory].
+Continue work on [Project Name] at [directory].
 
-**What's Done This Session**:
-- [completed item 1]
-- [completed item 2]
+**What's Done**: [1-2 bullets max]
 
 **Current State**: [where we left off - be specific]
 
-**Immediate Next Step**: [the very next thing to do]
+**Next Step**: [the very next thing to do]
+
+**Key Files**: [2-3 file paths relevant to next step]
 
 **Key Context**: [anything critical to remember]
+
+**Approach**: Do NOT explore the full codebase. Use the context above.
 ```
 
 Keep the continuation prompt SHORT (under 15 lines). The detailed state is now in CLAUDE.md — the prompt just needs enough to bridge the context clear.
+
+## Workflow
+
+User runs `/checkpoint`. Two things happen:
+
+1. CLAUDE.md is updated (long-term memory saved)
+2. Continuation prompt is displayed (short-term handoff ready)
+
+User can then:
+- **Clear now**: Copy prompt → `/clear` → paste → keep working
+- **Stop for the day**: Just close. CLAUDE.md has everything for next time.
+- **Keep working**: Do nothing, state is saved anyway
 
 ## Adapt to Session Complexity
 
