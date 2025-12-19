@@ -123,11 +123,38 @@ Reports:
   - bugs: reports/bugs-[feature].md
 ```
 
-### 7. Run /checkpoint
+### 7. Update CLAUDE.md & Output Continuation Prompt
 
-After completing the above, execute `/checkpoint` to:
-- Update Last Session with bug hunt summary
-- Generate continuation prompt for debugging phase
+**Update CLAUDE.md (KEEP IT LEAN):**
+- REPLACE `Last Session` entirely (don't nest "Previous Session" blocks)
+- Note how many bugs were found at each priority level
+- DELETE any completed items from `Next Steps` (don't strike through)
+- DELETE any `Session Log` or history sections if they exist
+- Target: CLAUDE.md should stay under 150 lines
+
+**Output this continuation prompt:**
+
+```
+## Continuation Prompt
+
+Continue work on [Project Name] at [directory].
+
+**Pipeline Phase**: debugging
+**Feature**: [feature name]
+**Current Tier**: high - pending
+
+**Scope** (work only on these files):
+- [files from the bug report Scope section]
+
+**Reports**:
+- bugs: reports/bugs-[feature].md
+
+**Next Action**: Fix high priority bugs from the bug report
+
+**Approach**: Do NOT explore the codebase. Read only the files in Scope above.
+```
+
+**STOP here.** Do not continue working. Wait for the user to copy this prompt, clear the context, and paste it to begin the debugging phase.
 
 ## Output Summary
 

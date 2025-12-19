@@ -23,17 +23,45 @@ Extract:
 
 If Pipeline State exists, read the most recent report to extract the **Scope** (file list).
 
-Then proceed to steps 1 and 2 below, but use the **Pipeline-Aware Continuation Prompt** format instead of the standard format.
+**Advance the Pipeline State** based on what work was just completed:
 
-### 1. Update CLAUDE.md
+| Current State | Next State |
+|---------------|------------|
+| debugging, high, in-progress | debugging, medium, pending |
+| debugging, medium, in-progress | debugging, low, pending |
+| debugging, low, in-progress | refactor-hunt, -, - |
+| refactoring, high, in-progress | refactoring, medium, pending |
+| refactoring, medium, in-progress | refactoring, low, pending |
+| refactoring, low, in-progress | build, -, - |
 
-Read the existing CLAUDE.md in the project root. Update these sections based on the current session:
+Update the Pipeline State section in CLAUDE.md with the new tier/phase.
 
-- **Last Session** - Update with today's date and what was done
-- **Current Focus** - Update if it changed
-- **Next Steps** - Update based on where we're leaving off
+Then proceed to steps 1 and 2 below, using the **Pipeline-Aware Continuation Prompt** format.
 
-Preserve everything else in the file. Write the changes.
+### 1. Update CLAUDE.md (KEEP IT LEAN)
+
+Read the existing CLAUDE.md in the project root. Apply these rules strictly:
+
+**Last Session** - REPLACE entirely (do NOT nest "Previous Session" blocks):
+- Delete the old Last Session content completely
+- Write only the current session's summary
+- Keep it to 5-10 lines max
+
+**Next Steps** - REMOVE completed items (do NOT use strikethrough):
+- Delete any items that are done
+- Keep only pending/future items
+- Renumber the list
+
+**Current Focus** - Update if it changed
+
+**Session Log / History sections** - DELETE if they exist:
+- Remove any `## Session Log` section
+- Remove any accumulated history
+- That's what git is for
+
+**Preserve only**: Project description, Current Focus, Pipeline State, Last Session, Next Steps
+
+Write the changes.
 
 If CLAUDE.md doesn't exist, create it using this structure:
 
@@ -82,32 +110,91 @@ Keep the continuation prompt SHORT (under 15 lines). The detailed state is now i
 
 ### Pipeline-Aware Continuation Prompt
 
-If Pipeline State was detected in step 0, use this format instead:
+If Pipeline State was detected in step 0, use this format based on the NEW state (after advancement):
 
+**For debugging phase (any tier):**
 ```
 ## Continuation Prompt
 
 Continue work on [Project Name] at [directory].
 
-**Pipeline Phase**: [phase]
+**Pipeline Phase**: debugging
 **Feature**: [feature name]
-**Current Tier**: [tier] - [status]
+**Current Tier**: [tier] - pending
 
 **Scope** (work only on these files):
-- [file1]
-- [file2]
-- [file3]
+- [files from bug report]
 
 **Reports**:
-- [report paths from Pipeline State]
+- bugs: [path]
+- fixes: [path if exists]
 
-**Next Action**: [phase-specific instruction]
-- debugging: "Fix [tier] priority bugs from the bug report"
-- refactor-hunt: "Analyze files for refactoring opportunities"
-- refactoring: "Execute [tier] priority refactors from the report"
-- build: "Pipeline complete. Resume normal development"
+**Next Action**: Fix [tier] priority bugs from the bug report
 
 **Approach**: Do NOT explore the codebase. Read only the files in Scope above.
+```
+
+**For refactor-hunt phase (transition from debugging):**
+```
+## Continuation Prompt
+
+Continue work on [Project Name] at [directory].
+
+**Pipeline Phase**: refactor-hunt
+**Feature**: [feature name]
+
+**Scope** (work only on these files):
+- [files from fixes report]
+
+**Reports**:
+- bugs: [path]
+- fixes: [path]
+
+**Next Action**: Run /refactor-hunt-checkpoint to analyze for refactoring opportunities
+
+**Approach**: Do NOT explore the codebase. Read only the files in Scope above.
+```
+
+**For refactoring phase (any tier):**
+```
+## Continuation Prompt
+
+Continue work on [Project Name] at [directory].
+
+**Pipeline Phase**: refactoring
+**Feature**: [feature name]
+**Current Tier**: [tier] - pending
+
+**Scope** (work only on these files):
+- [files from refactor report]
+
+**Reports**:
+- refactors: [path]
+
+**Next Action**: Execute [tier] priority refactors from the refactor report
+
+**Approach**: Do NOT explore the codebase. Read only the files in Scope above.
+```
+
+**For build phase (pipeline complete):**
+```
+## Continuation Prompt
+
+Continue work on [Project Name] at [directory].
+
+**Pipeline Complete** for feature: [feature name]
+
+**Reports** (for reference):
+- bugs: [path]
+- fixes: [path]
+- refactors: [path]
+
+**Pending Work** (from CLAUDE.md Next Steps):
+- [pending items]
+
+**Next Action**: [First pending item, or "Pipeline complete - check with user for next task"]
+
+**Approach**: Read CLAUDE.md for full context. You may explore the codebase as needed.
 ```
 
 ## Workflow
@@ -138,8 +225,11 @@ User can then:
 
 ## Guidelines
 
-- Don't bloat CLAUDE.md — keep updates concise
-- Don't bloat the continuation prompt — CLAUDE.md has the details
-- Always include the project path in the continuation prompt
+**CLAUDE.md should stay under 150 lines.** If it's longer, you're doing it wrong.
+
+- REPLACE Last Session, don't append to it
+- DELETE completed Next Steps, don't strike them through
+- DELETE Session Log / History sections entirely
+- Keep the continuation prompt SHORT (under 15 lines)
 - Be specific with file paths and function names
-- Prioritize actionable next steps
+- Detailed history belongs in git, not CLAUDE.md
