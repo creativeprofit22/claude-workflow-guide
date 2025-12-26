@@ -8,6 +8,24 @@ Find refactoring opportunities in validated files. Produce prioritized report.
 
 ## Instructions
 
+### 0. Execution Options (Ask First)
+
+Before proceeding, ask the user:
+
+**Question 1 - Parallel Execution:**
+> Run with parallel agents? (Analyze multiple files concurrently)
+> - Yes - Parallel file analysis
+> - No - Sequential analysis (default)
+
+**Question 2 - Ultra Think Mode:**
+> Enable ultra think mode? (Extended reasoning for refactor detection)
+> - Yes - Deep code quality analysis
+> - No - Standard execution (default)
+
+Store choices and apply throughout this command's execution.
+
+---
+
 ### 1. Get Scope
 
 Read CLAUDE.md Pipeline State:

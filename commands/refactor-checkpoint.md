@@ -8,6 +8,24 @@ Execute refactors from the report. Verify no regressions. Hand off to next build
 
 ## Instructions
 
+### 0. Execution Options (Ask First)
+
+Before proceeding, ask the user:
+
+**Question 1 - Parallel Execution:**
+> Run with parallel agents? (Execute independent refactors concurrently)
+> - Yes - Parallel refactoring
+> - No - Sequential execution (default)
+
+**Question 2 - Ultra Think Mode:**
+> Enable ultra think mode? (Extended reasoning before each refactor)
+> - Yes - Careful analysis before changes
+> - No - Standard execution (default)
+
+Store choices and apply throughout this command's execution.
+
+---
+
 ### 1. Get Scope & Report
 
 Read CLAUDE.md Pipeline State:

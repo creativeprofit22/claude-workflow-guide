@@ -8,6 +8,24 @@ Comprehensive validation of implemented feature. Fix issues until clean.
 
 ## Instructions
 
+### 0. Execution Options (Ask First)
+
+Before proceeding, ask the user:
+
+**Question 1 - Parallel Execution:**
+> Run with parallel agents? (Spawn separate agents for: Tests, API, UI, Wiring, Bottlenecks, Bugs)
+> - Yes - Parallel validation (faster, uses more resources)
+> - No - Sequential checks (default)
+
+**Question 2 - Ultra Think Mode:**
+> Enable ultra think mode? (Extended reasoning for each validation check)
+> - Yes - Deep analysis, thorough investigation
+> - No - Standard execution (default)
+
+Store choices and apply throughout this command's execution.
+
+---
+
 ### 1. Get Scope
 
 Read CLAUDE.md Pipeline State:

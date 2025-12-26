@@ -8,6 +8,24 @@ Implement a single feature, then hand off to validation.
 
 ## Instructions
 
+### 0. Execution Options (Ask First)
+
+Before proceeding, ask the user:
+
+**Question 1 - Parallel Execution:**
+> Run with parallel agents? (Multiple Task agents work concurrently on different parts of the feature)
+> - Yes - Spawn parallel agents
+> - No - Sequential execution (default)
+
+**Question 2 - Ultra Think Mode:**
+> Enable ultra think mode? (Extended reasoning before implementation)
+> - Yes - Deep analysis, thorough planning before coding
+> - No - Standard execution (default)
+
+Store choices and apply throughout this command's execution.
+
+---
+
 ### 1. Get Current Feature
 
 Read CLAUDE.md. Look for:

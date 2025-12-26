@@ -8,9 +8,27 @@ Save current session state to CLAUDE.md for long-term persistence AND output a c
 
 ## Instructions
 
+### 0. Execution Options (Ask First)
+
+Before proceeding, ask the user:
+
+**Question 1 - Parallel Execution:**
+> Run with parallel agents? (Multiple Task agents work concurrently)
+> - Yes - Spawn parallel agents for independent tasks
+> - No - Sequential execution (default)
+
+**Question 2 - Ultra Think Mode:**
+> Enable ultra think mode? (Extended reasoning before actions)
+> - Yes - Deep analysis, thorough planning before each step
+> - No - Standard execution (default)
+
+Store choices and apply throughout this command's execution.
+
+---
+
 Do TWO things:
 
-### 0. Check for Pipeline State (Do This First)
+### 1. Check for Pipeline State
 
 Read CLAUDE.md. If a `## Pipeline State` section exists, this is a **pipeline-aware checkpoint**.
 
@@ -22,7 +40,7 @@ Extract:
 
 If Pipeline State exists, generate a **Pipeline-Aware Continuation Prompt** (see below).
 
-### 1. Update CLAUDE.md (KEEP IT LEAN)
+### 2. Update CLAUDE.md (KEEP IT LEAN)
 
 Read the existing CLAUDE.md in the project root. Apply these rules strictly:
 
@@ -68,7 +86,7 @@ Files: [relevant files]
 3. [Third thing]
 ```
 
-### 2. Output Continuation Prompt
+### 3. Output Continuation Prompt
 
 After updating the file, output a ready-to-use continuation prompt for immediate context clearing:
 
