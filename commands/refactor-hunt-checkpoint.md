@@ -1,39 +1,34 @@
 ---
-description: Find refactoring opportunities, produce prioritized report (High/Med/Low)
+description: Find refactoring opportunities, produce report, hand off to refactoring
 ---
 
 # Refactor Hunt Checkpoint
 
-Find refactoring opportunities. Work only on files from the previous report's Scope.
+Find refactoring opportunities in validated files. Produce prioritized report.
 
 ## Instructions
 
 ### 1. Get Scope
 
-Read CLAUDE.md and extract from `Pipeline State`:
-- **Reports.fixes**: Path to fixes report (preferred)
-- **Reports.bugs**: Path to bug report (fallback if no fixes)
+Read CLAUDE.md Pipeline State:
 
-Load the report and extract the **Scope section** (file list).
-
-**If no Pipeline State or reports:** STOP and inform user:
+```markdown
+## Pipeline State
+Phase: refactor-hunt
+Feature: [feature name]
+Files-Validated: [files to analyze]
 ```
-Cannot proceed: No Pipeline State or reports found.
 
-Either:
-1. Run /bug-hunt-checkpoint to start the pipeline
-2. Or set up Current Focus with files and run /bug-hunt-checkpoint
-```
+**If no Pipeline State:** Ask user for files to analyze.
 
 ### 2. Read Each File
 
-- Use the Read tool on each file in scope
-- Do NOT use Glob, Grep, or Explore agents
-- If a file doesn't exist, note it and continue with others
+- Use Read tool on each file in scope
+- Do NOT explore beyond these files
 
 ### 3. Analyze for Refactors
 
-Look for these opportunities:
+Look for:
 
 | Category | What to Find |
 |----------|--------------|
@@ -55,119 +50,139 @@ Look for these opportunities:
 
 ### 5. Estimate Effort
 
-For each refactor, estimate effort:
-- **S (Small)**: Quick fix, single location, < 30 min
-- **M (Medium)**: Some thought needed, few locations, < 2 hours
-- **L (Large)**: Significant change, multiple files, > 2 hours
+- **S (Small)**: Quick fix, single location
+- **M (Medium)**: Some thought needed, few locations
+- **L (Large)**: Significant change, multiple files
 
 ### 6. Generate Refactor Report
 
 Create `reports/refactors-[feature].md`:
 
 ```markdown
-# Refactor Report: [Feature Name]
+# Refactor Report: [Feature]
 
 Generated: [YYYY-MM-DD]
-Feature: [name] (1 of N)
-Source: [fixes or bugs report path]
 
 ## Scope
 Files analyzed:
 - [file1]
 - [file2]
 
-## High Priority (Tech Debt / DRY)
+## High Priority
 | # | Location | Issue | Suggested Fix | Effort |
 |---|----------|-------|---------------|--------|
-| 1 | file:line | Problem description | How to fix | S/M/L |
+| 1 | file:line | Problem | Solution | S/M/L |
 
-## Medium Priority (Code Clarity)
+## Medium Priority
 | # | Location | Issue | Suggested Fix | Effort |
 |---|----------|-------|---------------|--------|
 
-## Low Priority (Nice-to-Have)
+## Low Priority
 | # | Location | Issue | Suggested Fix | Effort |
 |---|----------|-------|---------------|--------|
 
 ## Summary
-- High: X refactors (Y Small, Z Medium, W Large)
-- Medium: X refactors
-- Low: X refactors
+- High: X refactors
+- Medium: Y refactors
+- Low: Z refactors
 - Total: N refactors
 ```
 
-**Copy the Scope section from the source report** — this maintains the file chain.
+### 7. Handle Empty Results
 
-### 7. Update Pipeline State
+**If no refactors found:**
+- Skip refactoring phase
+- Output continuation for next feature build instead
 
-Update CLAUDE.md:
+### 8. Update Pipeline State
 
 ```markdown
 ## Pipeline State
 Phase: refactoring
-Feature: [name]
-Tier: high
-Tier-Status: pending
-Reports:
-  - bugs: reports/bugs-[feature].md
-  - fixes: reports/fixes-[feature].md
-  - refactors: reports/refactors-[feature].md
+Feature: [feature name]
+Files: [file list]
+Refactor-Report: reports/refactors-[feature].md
+Refactors-Remaining: [total count]
 ```
 
-### 8. Update CLAUDE.md & Output Continuation Prompt
+### 9. Update CLAUDE.md & Output Continuation
 
 **Update CLAUDE.md (KEEP IT LEAN):**
-- REPLACE `Last Session` entirely (don't nest "Previous Session" blocks)
-- Note how many refactors were found at each priority level
-- DELETE any completed items from `Next Steps` (don't strike through)
-- DELETE any `Session Log` or history sections if they exist
-- Target: CLAUDE.md should stay under 150 lines
+- REPLACE `Last Session` with refactor-hunt summary
+- Update `Pipeline State` as above
 
-**Output this continuation prompt:**
+**If refactors found, output:**
 
 ```
 ## Continuation Prompt
 
-Continue work on [Project Name] at [directory].
+Continue work on [Project] at [directory].
 
-**Pipeline Phase**: refactoring
+**Phase**: refactoring
 **Feature**: [feature name]
-**Current Tier**: high - pending
 
-**Scope** (work only on these files):
-- [files from the refactor report Scope section]
+**Files to refactor**:
+- [file1]
+- [file2]
 
-**Reports**:
-- bugs: reports/bugs-[feature].md
-- fixes: reports/fixes-[feature].md
-- refactors: reports/refactors-[feature].md
+**Refactor Report**: reports/refactors-[feature].md
+- High: X
+- Medium: Y
+- Low: Z
 
-**Next Action**: Execute high priority refactors from the refactor report
+**Next Action**: Execute refactors from report. Start with High priority.
 
-**Approach**: Do NOT explore the codebase. Read only the files in Scope above.
+For each refactor:
+1. Read the location
+2. Apply the fix
+3. Verify no regressions
+
+**Approach**: Read only the files listed above.
 ```
 
-**STOP here.** Do not continue working. Wait for the user to copy this prompt, clear the context, and paste it to begin the refactoring phase.
+**If NO refactors found, output:**
+
+```
+## Continuation Prompt
+
+Continue work on [Project] at [directory].
+
+**Phase**: build
+**Feature**: [next feature name]
+
+**Previous feature complete**: [feature name]
+- Built, validated, no refactors needed
+
+**Next Action**: Implement the next feature.
+
+**Features remaining**:
+- [list from CLAUDE.md]
+
+**Approach**: Read CLAUDE.md for feature details and scope.
+```
+
+**STOP.** Wait for context clear.
 
 ## Output Summary
 
-When complete, confirm:
 ```
-Refactor hunt complete for [feature].
+Refactor hunt complete for: [feature]
 
 Report: reports/refactors-[feature].md
-- High: X refactors
-- Medium: Y refactors
-- Low: Z refactors
+- High: X
+- Medium: Y
+- Low: Z
+- Total: N
 
-Pipeline state updated. Ready for /refactoring-checkpoint.
+[Ready for refactoring / No refactors needed - ready for next feature]
+
+Copy the continuation prompt, clear context, and paste.
 ```
 
 ## Guidelines
 
 - Focus on actionable refactors, not theoretical improvements
-- Don't flag things that are "just different" — only actual issues
+- Don't flag "just different" — only actual issues
 - Include specific file:line references
 - Be realistic with effort estimates
-- If no refactors found in a tier, leave the table empty (don't remove it)
-- Prioritize refactors that would make future work easier
+- If a file is clean, say so

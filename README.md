@@ -1,204 +1,209 @@
-# 🚀 Claude Code Checkpoint Workflow Guide
+# Claude Checkpoint Workflow Guide
 
-> **Credit:** Massive props to Willem! This guide fuses an existing prompt with his approach to find the optimal hybrid workflow.
+A systematic pipeline for feature development with Claude Code. Build, validate, refactor — with context clears between phases to prevent bloat.
 
-📦 **Get the checkpoint command:** [github.com/creativeprofit22/claude-workflow-guide](https://github.com/creativeprofit22/claude-workflow-guide)
-
----
-
-## 📋 Table of Contents
-
-- [The Ideal Workflow](#-the-ideal-workflow)
-- [Fresh Builds: Step by Step](#-fresh-builds-step-by-step)
-- [Modifying Builds: Step by Step](#-modifying-builds-step-by-step)
+📦 **Get the commands:** [github.com/creativeprofit22/claude-checkpoint-workflow-guide](https://github.com/creativeprofit22/claude-checkpoint-workflow-guide)
 
 ---
 
-## 🔄 The Ideal Workflow
-
-> **Coming Soon:** Three extra commands are planned: `bug-hunt`, `debugging`, and `refactor` to make this workflow even more powerful.
-
-### Complete Development Cycle
+## Pipeline Overview
 
 ```
-Build Phase 1
-    ↓
-🐛 Bug Hunt → 🔧 Debugging → ✨ Refactoring → 🏗️ Build Next Phase
-    ↓
-Rinse & Repeat
+┌─────────────────────────────────────────────────────────────┐
+│                    PER-FEATURE CYCLE                        │
+│                                                             │
+│  BUILD          → continuation prompt → clear context       │
+│       ↓                                                     │
+│  VALIDATE       → continuation prompt → clear context       │
+│       ↓                                                     │
+│  REFACTOR-HUNT  → continuation prompt → clear context       │
+│       ↓                                                     │
+│  REFACTORING    → continuation prompt → clear context       │
+│       ↓                                                     │
+│  NEXT FEATURE   (repeat cycle)                              │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Detailed Steps
-
-#### 1️⃣ Bug Hunt Phase
-1. Run `/bug-hunt-checkpoint`
-2. Copy the bug-hunt continuation prompt
-3. Clear context
-4. Paste the continuation prompt
-5. **Output:** Bug report
-
-#### 2️⃣ Debugging Phase
-1. Run `/debugging-checkpoint`
-2. Copy the debugging continuation prompt
-3. Clear context
-4. Paste the continuation prompt
-5. **Output:** Fixes report
-
-#### 3️⃣ Refactoring Phase
-1. Run `/refactor-checkpoint`
-2. **Output:** Refactoring needs report
-3. Copy the refactor continuation prompt
-4. Clear context
-5. Paste the continuation prompt
-6. **Output:** Completion report
-
-#### 4️⃣ Build Next Phase
-1. Run the original `/checkpoint` command
-2. Copy the continuation prompt
-3. Paste the continuation prompt
-4. Build the next phase
-5. **Repeat the cycle**
-
-> ⚠️ **Important:** Each phase (Bug Hunt, Debugging, Refactoring, Build) should be further divided step-by-step. Run `/checkpoint` between steps as needed. Determine appropriate points to **commit and push**.
+Each phase ends with a context clear. Fresh context = better focus.
 
 ---
 
-## 🆕 Fresh Builds: Step by Step
+## Commands
 
-### Prompt #1 — Research Phase
-
-> 💡 **Tip:** Be as specific as possible without writing a book. Break down objectives, features, and architecture ideas into concise paragraphs.
-
-**Template:**
-Do some research on GitHub via grep MCP, deploy 5 build-research agents
-to determine the highest-quality structure, architecture, coding,
-components, and implementation for my project/build.
-
-The structure should be broken down comprehensively and in a modular
-manner to ensure the highest quality possible and to facilitate
-implementation, exploration, debugging, and testing.
-
-Also mention the GitHub repos and their paths in your report.
-```
-
-**After approval:**
-- ✅ Commit and push findings to a new local and online repo
-- ✅ Ensure your MD mentions the relevant path(s)
+| Command | Purpose |
+|---------|---------|
+| `/build-checkpoint` | Implement feature → hand off to validation |
+| `/validate-checkpoint` | Tests, API, UI, wiring, bottlenecks, bugs → fix loop |
+| `/refactor-hunt-checkpoint` | Find refactoring opportunities → produce report |
+| `/refactor-checkpoint` | Execute refactors → hand off to next feature |
+| `/checkpoint` | Universal hand-off (works in any phase) |
+| `/handoff` | Git commit, push, generate HANDOFF.md |
 
 ---
 
-### Prompt #2 — Execution Planning
+## Installation
 
-> 🧹 Clear context before this step
+Copy commands to your Claude Code config:
 
-**Template:**
+```bash
+# Create commands directory if it doesn't exist
+mkdir -p ~/.claude/commands
+
+# Copy commands
+cp commands/*.md ~/.claude/commands/
 ```
-[Point towards your research documentation path]
-
-Draw a step-by-step execution plan, respecting the structure
-and architecture of the repo.
-```
-
-**After approval:**
-- ✅ Push and commit to a new sub-folder in your repo
 
 ---
 
-### Prompt #3 — Build Phase
+## Usage
 
-> 🧹 Clear context before this step
+### 1. Setup CLAUDE.md
 
-**Template:**
+Ensure your project has a CLAUDE.md with features and scope:
+
+```markdown
+## Current Focus
+Section: Authentication
+Files: src/auth/login.ts, src/auth/session.ts
+
+## Next Steps
+1. Add login form validation
+2. Add session persistence
+3. Add logout functionality
 ```
-Deploy [X] number of coding agents to build step/phase 1
-```
 
-**After approval:**
-1. Run `/checkpoint`
-2. Commit and push
-3. Copy continuation prompt
-4. Clear context
-5. Paste in new chat
-6. **Continue to next phase**
+### 2. Run the Cycle
+
+```bash
+# Implement feature 1
+/build-checkpoint
+# → Builds the feature
+# → Outputs continuation prompt
+# → Clear context, paste prompt
+
+# Validate the implementation
+/validate-checkpoint
+# → Runs tests, checks API, verifies UI
+# → Traces wiring, looks for bottlenecks/bugs
+# → Fixes issues found
+# → Outputs continuation prompt
+# → Clear context, paste prompt
+
+# Hunt for refactors
+/refactor-hunt-checkpoint
+# → Analyzes code quality
+# → Produces refactor report (or skips if clean)
+# → Outputs continuation prompt
+# → Clear context, paste prompt
+
+# Execute refactors
+/refactor-checkpoint
+# → Applies refactors from report
+# → Outputs continuation prompt for next feature
+# → Clear context, paste prompt
+
+# Repeat for feature 2, 3, etc.
+```
 
 ---
 
-## 🔧 Modifying Builds: Step by Step
+## Validation Checks
 
-### Prompt #1 — Research Improvements
+`/validate-checkpoint` performs comprehensive validation:
 
-**Template:**
-```
-Do some research on GitHub via grep MCP, deploy 5 build-research agents
-to determine how to improve the structure, architecture, coding,
-components, and implementation of the following build:
+| Check | What It Does |
+|-------|--------------|
+| Tests | Run test suite (npm test, pytest, etc.) |
+| API | Verify endpoints work (curl/fetch) |
+| UI | Check components render correctly |
+| Wiring | Trace data flow (UI → Logic → API) |
+| Bottlenecks | Look for performance issues |
+| Bugs | Find logic errors, edge cases, race conditions |
 
-[Insert the path to your existing build]
-
-The structure should be broken down comprehensively and in a modular
-manner to ensure the highest quality possible and to facilitate
-implementation, exploration, debugging, and testing.
-
-Also mention the GitHub repos and their paths in your report.
-```
-
-**After approval:**
-- ✅ Commit and push findings to a new repo
-- ✅ Ensure your MD mentions the build you're modifying
+Issues are fixed in-place. Loop until all checks pass.
 
 ---
 
-### Prompt #2 — Execution Planning
+## Refactor Categories
 
-> 🧹 Clear context before this step
+`/refactor-hunt-checkpoint` looks for:
 
-**Template:**
-```
-[Point towards your research documentation path]
+| Priority | What to Find |
+|----------|--------------|
+| **High** | DRY violations, high complexity, tech debt |
+| **Medium** | Code clarity, maintainability, inconsistent patterns |
+| **Low** | Style consistency, minor improvements |
 
-Draw a step-by-step execution plan, respecting the structure
-and architecture of the repo.
-```
-
-**After approval:**
-- ✅ Push and commit to a new sub-folder
-
----
-
-### Prompt #3 — Build Phase
-
-> 🧹 Clear context before this step
-
-**Template:**
-```
-Deploy [X] number of coding agents to build step/phase 1
-```
-
-**After approval:**
-1. Run `/checkpoint`
-2. Commit and push
-3. Copy continuation prompt
-4. Clear context
-5. Paste in new chat
-6. **Continue to next phase**
+Each refactor includes:
+- File:line location
+- Issue description
+- Suggested fix
+- Effort estimate (S/M/L)
 
 ---
 
-## 📝 Quick Reference
+## Reports
 
-| Phase | Command | Output |
-|-------|---------|--------|
-| Bug Hunt | `/bug-hunt-checkpoint` | Bug report |
-| Debugging | `/debugging-checkpoint` | Fixes report |
-| Refactoring | `/refactor-checkpoint` | Refactor report |
-| Save Progress | `/checkpoint` | Continuation prompt |
+The pipeline generates reports in your project:
+
+```
+[project]/reports/
+├── validation-[feature].md   # Validation results
+└── refactors-[feature].md    # Refactoring opportunities
+```
+
+---
+
+## State Tracking
+
+Pipeline state is tracked in CLAUDE.md:
+
+```markdown
+## Pipeline State
+Phase: build | validate | refactor-hunt | refactoring
+Feature: [current feature]
+Files: [scoped files]
+Reports:
+  - validation: reports/validation-[feature].md
+  - refactors: reports/refactors-[feature].md
+```
+
+---
+
+## Quick Reference
+
+| Action | Command |
+|--------|---------|
+| Start building | `/build-checkpoint` |
+| Validate implementation | `/validate-checkpoint` |
+| Find refactors | `/refactor-hunt-checkpoint` |
+| Execute refactors | `/refactor-checkpoint` |
+| Generic save point | `/checkpoint` |
+| Git + docs | `/handoff` |
+
+---
+
+## Design Principles
+
+1. **Context management** — Clear between phases to prevent bloat
+2. **Scope discipline** — Only work on listed files, no exploration
+3. **Fix in place** — Validation fixes issues, doesn't just report
+4. **Progressive refinement** — Build → Validate → Refactor → Next
+5. **Short prompts** — Continuation prompts under 15 lines
+
+---
+
+## Credits
+
+Massive props to Willem for the original approach. This guide fuses that with systematic validation and refactoring workflows.
 
 ---
 
 <div align="center">
 
-**Happy Building!** 🎉
+**Happy Building!**
 
-*Remember: Clear context → Paste prompt → Execute → Checkpoint → Repeat*
+*Clear context → Paste prompt → Execute → Checkpoint → Repeat*
 
 </div>

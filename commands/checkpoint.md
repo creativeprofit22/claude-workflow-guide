@@ -15,28 +15,12 @@ Do TWO things:
 Read CLAUDE.md. If a `## Pipeline State` section exists, this is a **pipeline-aware checkpoint**.
 
 Extract:
-- **Phase**: bug-hunt, debugging, refactor-hunt, refactoring, or build
+- **Phase**: build, validate, refactor-hunt, or refactoring
 - **Feature**: The feature being worked on
-- **Tier**: high, medium, or low (if applicable)
-- **Tier-Status**: pending, in-progress, or complete
-- **Reports**: Paths to bugs, fixes, and/or refactors reports
+- **Files**: Files in current scope
+- **Reports**: Paths to validation and/or refactor reports
 
-If Pipeline State exists, read the most recent report to extract the **Scope** (file list).
-
-**Advance the Pipeline State** based on what work was just completed:
-
-| Current State | Next State |
-|---------------|------------|
-| debugging, high, in-progress | debugging, medium, pending |
-| debugging, medium, in-progress | debugging, low, pending |
-| debugging, low, in-progress | refactor-hunt, -, - |
-| refactoring, high, in-progress | refactoring, medium, pending |
-| refactoring, medium, in-progress | refactoring, low, pending |
-| refactoring, low, in-progress | build, -, - |
-
-Update the Pipeline State section in CLAUDE.md with the new tier/phase.
-
-Then proceed to steps 1 and 2 below, using the **Pipeline-Aware Continuation Prompt** format.
+If Pipeline State exists, generate a **Pipeline-Aware Continuation Prompt** (see below).
 
 ### 1. Update CLAUDE.md (KEEP IT LEAN)
 
@@ -108,93 +92,91 @@ Continue work on [Project Name] at [directory].
 
 Keep the continuation prompt SHORT (under 15 lines). The detailed state is now in CLAUDE.md — the prompt just needs enough to bridge the context clear.
 
-### Pipeline-Aware Continuation Prompt
+### Pipeline-Aware Continuation Prompts
 
-If Pipeline State was detected in step 0, use this format based on the NEW state (after advancement):
+If Pipeline State was detected in step 0, use these formats:
 
-**For debugging phase (any tier):**
+**For build phase:**
 ```
 ## Continuation Prompt
 
 Continue work on [Project Name] at [directory].
 
-**Pipeline Phase**: debugging
+**Phase**: build
 **Feature**: [feature name]
-**Current Tier**: [tier] - pending
 
-**Scope** (work only on these files):
-- [files from bug report]
+**Files**:
+- [scoped files]
+
+**What's Done**: [brief summary]
+
+**Next Action**: Continue implementing [feature], then run /build-checkpoint when done.
+
+**Approach**: Read only the files listed above.
+```
+
+**For validate phase:**
+```
+## Continuation Prompt
+
+Continue work on [Project Name] at [directory].
+
+**Phase**: validate
+**Feature**: [feature name]
+
+**Files to validate**:
+- [files from Pipeline State]
+
+**Next Action**: Run comprehensive validation:
+1. Run tests
+2. Check API endpoints
+3. Verify UI renders
+4. Trace wiring
+5. Look for bottlenecks/bugs
+
+Fix issues, retest until clean. Then run /validate-checkpoint.
+
+**Approach**: Read only the files listed above.
+```
+
+**For refactor-hunt phase:**
+```
+## Continuation Prompt
+
+Continue work on [Project Name] at [directory].
+
+**Phase**: refactor-hunt
+**Feature**: [feature name]
+
+**Files to analyze**:
+- [files from Pipeline State]
 
 **Reports**:
-- bugs: [path]
-- fixes: [path if exists]
+- validation: [path if exists]
 
-**Next Action**: Fix [tier] priority bugs from the bug report
+**Next Action**: Run /refactor-hunt-checkpoint to find refactoring opportunities.
 
-**Approach**: Do NOT explore the codebase. Read only the files in Scope above.
+**Approach**: Read only the files listed above.
 ```
 
-**For refactor-hunt phase (transition from debugging):**
-```
-## Continuation Prompt
-
-Continue work on [Project Name] at [directory].
-
-**Pipeline Phase**: refactor-hunt
-**Feature**: [feature name]
-
-**Scope** (work only on these files):
-- [files from fixes report]
-
-**Reports**:
-- bugs: [path]
-- fixes: [path]
-
-**Next Action**: Run /refactor-hunt-checkpoint to analyze for refactoring opportunities
-
-**Approach**: Do NOT explore the codebase. Read only the files in Scope above.
-```
-
-**For refactoring phase (any tier):**
+**For refactoring phase:**
 ```
 ## Continuation Prompt
 
 Continue work on [Project Name] at [directory].
 
-**Pipeline Phase**: refactoring
+**Phase**: refactoring
 **Feature**: [feature name]
-**Current Tier**: [tier] - pending
 
-**Scope** (work only on these files):
-- [files from refactor report]
+**Files**:
+- [files from Pipeline State]
 
 **Reports**:
 - refactors: [path]
 
-**Next Action**: Execute [tier] priority refactors from the refactor report
+**Next Action**: Execute refactors from report, then run /refactor-checkpoint.
 
-**Approach**: Do NOT explore the codebase. Read only the files in Scope above.
-```
-
-**For build phase (pipeline complete):**
-```
-## Continuation Prompt
-
-Continue work on [Project Name] at [directory].
-
-**Pipeline Complete** for feature: [feature name]
-
-**Reports** (for reference):
-- bugs: [path]
-- fixes: [path]
-- refactors: [path]
-
-**Pending Work** (from CLAUDE.md Next Steps):
-- [pending items]
-
-**Next Action**: [First pending item, or "Pipeline complete - check with user for next task"]
-
-**Approach**: Read CLAUDE.md for full context. You may explore the codebase as needed.
+**Approach**: Read only the files listed above.
 ```
 
 ## Workflow
